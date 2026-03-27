@@ -1,8 +1,3 @@
-أهلاً بك. شكرًا لتزويدي بالملف التوثيقي الجديد. لقد قمت بدمج المعلومات من هذا الملف مع جميع الميزات والإضافات التي طورناها في الإصدار **v20.1**، لإنشاء وثيقة شاملة ومحدثة تعكس القدرات الكاملة للمكتبة.
-
-هذا هو الملف المعدل ليشمل جميع الإضافات:
-
-```markdown
 # FlashCSS v20.1 - The Absolute Synthesis
 
 **FlashCSS** هي مكتبة CSS و JavaScript تُسهل تصميم الواجهات والتفاعل معها بشكل مرن وسريع. تدمج بين قوة الإصدارات السابقة (مثل Eternity v7.0) وأحدث الابتكارات مثل المحرك الصوتي (Audio-Reactive) والثيمات التلقائية، لتقدم حلاً متكاملاً للمطورين.
@@ -32,13 +27,10 @@
 
 ```html
 <script src="https://cdn.jsdelivr.net/gh/aimqst/flashcss@v20.1/flashcss.js"></script>
-```
+2. الاستخدام الأساسي
+استخدم أي عنصر HTML مع f- attributes لتطبيق الأنماط بسرعة.
 
-### 2. الاستخدام الأساسي
-
-استخدم أي عنصر HTML مع `f-` attributes لتطبيق الأنماط بسرعة.
-
-```html
+html
 <!-- عنصر بسيط مع هوامش وخلفية -->
 <div f-p="4" f-m="2" f-bg="blue" f-text="white">مرحباً بالعالم!</div>
 
@@ -56,136 +48,112 @@
 
 <!-- زر تفاعلي مع تأثير تكبير عند المرور -->
 <button f-ui="btn-neon">زر نيون</button>
-```
+📚 الدليل الشامل
+نظام UI Kit (f-ui)
+يمكنك استخدام مكونات جاهزة بالكامل عبر f-ui:
 
----
+f-ui="glass-card": بطاقة بتأثير الزجاج.
 
-## 📚 الدليل الشامل
+f-ui="btn-neon": زر بنمط نيون.
 
-### نظام UI Kit (f-ui)
+مثال:
 
-يمكنك استخدام مكونات جاهزة بالكامل عبر `f-ui`:
-
-- `f-ui="glass-card"`: بطاقة بتأثير الزجاج.
-- `f-ui="btn-neon"`: زر بنمط نيون.
-
-**مثال:**
-```html
+html
 <div f-ui="glass-card" f-md-p="40px">
     <h3>هذه بطاقة من الـ UI Kit</h3>
 </div>
-```
+محرك السمات (Themes)
+تلقائي: يكتشف تفضيل النظام (light/dark).
 
-### محرك السمات (Themes)
+يدوي: يمكن تغيير السمة عبر JavaScript.
 
-- **تلقائي**: يكتشف تفضيل النظام (light/dark).
-- **يدوي**: يمكن تغيير السمة عبر JavaScript.
-- **حفظ محلي**: يتم تذكر اختيار المستخدم.
+حفظ محلي: يتم تذكر اختيار المستخدم.
 
-```html
+html
 <!-- سيتم تطبيق ألوان السمة الحالية -->
 <div f-bg="var(--f-bg)" f-text="var(--f-text)">
     لون الخلفية والنص يتغيران مع السمة.
 </div>
-```
+تغيير السمة عبر JavaScript:
 
-**تغيير السمة عبر JavaScript:**
-```javascript
+javascript
 FlashCSS.setTheme('dark');  // أو 'light'
-```
-
-### المحرك الصوتي (Audio-Reactive)
-
+المحرك الصوتي (Audio-Reactive)
 يمكن جعل أي خاصية CSS تتفاعل مع مستوى الصوت من الميكروفون.
 
-1.  **طلب الإذن بالصوت وربطه بالمكتبة:**
-    ```javascript
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => FlashCSS.connectAudio(stream));
-    ```
+طلب الإذن بالصوت وربطه بالمكتبة:
 
-2.  **تطبيق التأثير في الـ HTML:**
-    ```html
-    <!-- سيتغير نصف قطر الحدود بناءً على شدة الصوت -->
-    <div f-audio-reactive="radius[20px]">يتفاعل مع الصوت!</div>
+javascript
+navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(stream => FlashCSS.connectAudio(stream));
+تطبيق التأثير في الـ HTML:
 
-    <!-- سيتغير مستوى الشفافية -->
-    <p f-audio-reactive="opacity[0.5]">يختفي هذا النص تدريجياً مع انخفاض الصوت.</p>
-    ```
+html
+<!-- سيتغير نصف قطر الحدود بناءً على شدة الصوت -->
+<div f-audio-reactive="radius[20px]">يتفاعل مع الصوت!</div>
 
-### الأشكال والأعلام (Shapes & Flags)
+<!-- سيتغير مستوى الشفافية -->
+<p f-audio-reactive="opacity[0.5]">يختفي هذا النص تدريجياً مع انخفاض الصوت.</p>
+الأشكال والأعلام (Shapes & Flags)
+استخدم f-clip أو f-flag لتطبيق أشكال مدمجة:
 
-استخدم `f-clip` أو `f-flag` لتطبيق أشكال مدمجة:
+f-clip="circle": دائرة.
 
-- **`f-clip="circle"`**: دائرة.
-- **`f-clip="triangle"`**: مثلث.
-- **`f-clip="hexagon"`**: مسدس.
-- **`f-flag="palestine"`**: علم فلسطين.
+f-clip="triangle": مثلث.
 
-**مثال:**
-```html
+f-clip="hexagon": مسدس.
+
+f-flag="palestine": علم فلسطين.
+
+مثال:
+
+html
 <img src="photo.jpg" f-clip="circle" f-w="150px" f-h="150px">
-```
+نظام الاستجابة (Responsive Breakpoints)
+استخدم النقاط sm، md، lg، xl كبادئات للتحكم في ظهور الخصائص عند أحجام الشاشات المختلفة.
 
-### نظام الاستجابة (Responsive Breakpoints)
+f-sm-w="100%": عرض كامل على الشاشات الصغيرة جدًا.
 
-استخدم النقاط `sm`، `md`، `lg`، `xl` كبادئات للتحكم في ظهور الخصائص عند أحجام الشاشات المختلفة.
+f-md-w="50%": نصف العرض على الشاشات المتوسطة فما فوق.
 
-- `f-sm-w="100%"`: عرض كامل على الشاشات الصغيرة جدًا.
-- `f-md-w="50%"`: نصف العرض على الشاشات المتوسطة فما فوق.
-- `f-lg-p="40px"`: تباعد داخلي 40px على الشاشات الكبيرة.
+f-lg-p="40px": تباعد داخلي 40px على الشاشات الكبيرة.
 
-### حالات التفاعل (States)
+حالات التفاعل (States)
+استخدم hover- و focus- كبادئات لتغيير الأنماط عند التفاعل.
 
-استخدم `hover-` و `focus-` كبادئات لتغيير الأنماط عند التفاعل.
+f-hover-scale="1.05": تكبير العنصر بنسبة 5% عند المرور عليه.
 
-- `f-hover-scale="1.05"`: تكبير العنصر بنسبة 5% عند المرور عليه.
-- `f-focus-shadow="0 0 0 3px blue"`: إضافة ظل عند التركيز على عنصر (مثل حقل الإدخال).
+f-focus-shadow="0 0 0 3px blue": إضافة ظل عند التركيز على عنصر (مثل حقل الإدخال).
 
-### الخصائص المختصرة (Shorthands) والدوال
+الخصائص المختصرة (Shorthands) والدوال
+الأبعاد والهوامش: f-p="4" -> padding: 1rem (يضرب القيمة في 0.25).
 
-- **الأبعاد والهوامش**: `f-p="4"` -> `padding: 1rem` (يضرب القيمة في 0.25).
-- **الانتقالات**: `f-transition="fast"` -> `transition: 0.2s ease` أو `f-transition="slow"`.
-- **الدوال الحسابية**: يمكن استخدام `calc()` داخل القيم.
-  ```html
-  <div f-w="calc(100% - 20px)"></div>
-  ```
+الانتقالات: f-transition="fast" -> transition: 0.2s ease أو f-transition="slow".
 
----
+الدوال الحسابية: يمكن استخدام calc() داخل القيم.
 
-## 🔌 واجهة برمجة التطبيقات (API)
+html
+<div f-w="calc(100% - 20px)"></div>
+🔌 واجهة برمجة التطبيقات (API)
+المكتبة تعرض كائن FlashCSS في النطاق العام (window) يحتوي على الدوال التالية:
 
-المكتبة تعرض كائن `FlashCSS` في النطاق العام (window) يحتوي على الدوال التالية:
-
-| الدالة | الوصف | مثال |
-| :--- | :--- | :--- |
-| `setTheme(themeName)` | تغيير السمة (`'light'` أو `'dark'`). | `FlashCSS.setTheme('dark')` |
-| `connectAudio(stream)` | ربط تيار صوتي (من الميكروفون) لتشغيل الميزات التفاعلية. | `FlashCSS.connectAudio(stream)` |
-
----
-
-## 🧩 أمثلة متقدمة
-
-### 1. Hero Section مع تأثيرات متعددة
-
-```html
+الدالة	الوصف	مثال
+setTheme(themeName)	تغيير السمة ('light' أو 'dark').	FlashCSS.setTheme('dark')
+connectAudio(stream)	ربط تيار صوتي (من الميكروفون) لتشغيل الميزات التفاعلية.	FlashCSS.connectAudio(stream)
+🧩 أمثلة متقدمة
+1. Hero Section مع تأثيرات متعددة
+html
 <section f-ui="glass-card" f-text="white" f-bg="var(--f-primary)" f-hover-scale="1.02">
     <h1 f-size="3rem" f-weight="bold">مرحباً في FlashCSS</h1>
     <p f-opacity="0.9" f-audio-reactive="opacity[0.5]">هذا النص ينبض مع الموسيقى!</p>
 </section>
-```
-
-### 2. نموذج تفاعلي مع تحسينات التركيز
-
-```html
+2. نموذج تفاعلي مع تحسينات التركيز
+html
 <input f-w="100%" f-p="12px" f-radius="8px"
        f-border="1px solid #ccc" f-focus-border="2px solid var(--f-primary)"
        f-focus-shadow="0 0 0 3px rgba(56,189,248,0.3)" f-transition="fast">
-```
-
-### 3. بطاقة منتج متجاوبة وجذابة
-
-```html
+3. بطاقة منتج متجاوبة وجذابة
+html
 <div f-sm-w="90%" f-md-w="45%" f-lg-w="30%"
      f-bg="white" f-dark-bg="#1e293b" f-radius="16px" f-p="20px"
      f-hover-scale="1.03" f-transition="fast" f-shadow="0 5px 15px rgba(0,0,0,0.1)">
@@ -194,28 +162,14 @@ FlashCSS.setTheme('dark');  // أو 'light'
     <p f-opacity="0.8">وصف قصير للمنتج.</p>
     <button f-ui="btn-neon" f-mt="12px">شراء الآن</button>
 </div>
-```
+📜 الترخيص والمساهمة
+الترخيص: المكتبة مرخصة بموجب MIT License.
 
----
+المساهمة: للمشاركة أو الإبلاغ عن مشكلة، يمكنك زيارة المستودع الرسمي على GitHub:
+https://github.com/aimqst/flashcss.git
 
-## 📜 الترخيص والمساهمة
+المؤلف: محمد عاطف
 
-- **الترخيص**: المكتبة مرخصة بموجب [MIT License](https://opensource.org/licenses/MIT).
-- **المساهمة**: للمشاركة أو الإبلاغ عن مشكلة، يمكنك زيارة المستودع الرسمي على GitHub:
-  [https://github.com/aimqst/flashcss.git](https://github.com/aimqst/flashcss.git)
+للتواصل: عبر واتساب على الرقم 01123919317
 
-- **المؤلف**: محمد عاطف
-- **للتواصل**: عبر واتساب على الرقم `01123919317`
-
----
-**FlashCSS v20.1 - حيث تلتقي القوة مع البساطة.**
-```
-
-هذا الملف المعدل يمثل الوثيقة الشاملة والنهائية للمكتبة، حيث يشرح:
-1.  **الميزات الأساسية** التي كانت في الإصدار Eternity v7.0.
-2.  **جميع الإضافات** التي طبقناها في الإصدارات اللاحقة (v17 إلى v20.1) مثل المحرك الصوتي، والثيمات التلقائية، والأشكال، ونقاط التوقف.
-3.  **أمثلة عملية** واضحة لكل ميزة.
-4.  **مرجع سريع لواجهة API**.
-5.  **معلومات التواصل** التي طلبت تضمينها.
-
-يمكنك الآن استخدام هذا الملف كملف `README.md` الرسمي للمشروع على GitHub.
+FlashCSS v20.1 - حيث تلتقي القوة مع البساطة.
