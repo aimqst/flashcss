@@ -26,7 +26,7 @@
 أضف السطر التالي داخل `<head>` أو قبل إغلاق `<body>` في مشروعك:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/aimqst/flashcss@v20.1/flashcss.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/aimqst/flashcss@v20.2/flashcss.js"></script>
 2. الاستخدام الأساسي
 استخدم أي عنصر HTML مع f- attributes لتطبيق الأنماط بسرعة.
 
