@@ -1,16 +1,20 @@
 /**
- * FlashCSS v20.1 - The Final Polish
- * Cumulative, Stable, and Intelligent
+ * FlashCSS v20.2 - The Bug-Fix Edition
+ * Fixes: appendChild null, replace() of undefined, empty attributes
  */
 const FlashCSS = (function() {
+    // 1. حماية الـ Head والـ Body (FOUC Protection)
     const hideStyle = document.createElement('style');
     hideStyle.id = 'f-shield';
     hideStyle.innerHTML = 'html { opacity: 0; transition: opacity 0.4s ease; }';
-    document.head.appendChild(hideStyle);
+    
+    // التأكد من وجود head قبل الحقن
+    const head = document.head || document.getElementsByTagName('head')[0];
+    if (head) head.appendChild(hideStyle);
 
     const styleSheet = document.createElement('style');
     styleSheet.id = 'f-v20-engine';
-    document.head.appendChild(styleSheet);
+    if (head) head.appendChild(styleSheet);
     const sheet = styleSheet.sheet;
     const processedRules = new Set();
 
@@ -34,8 +38,7 @@ const FlashCSS = (function() {
     const map = {
         'p': 'padding', 'm': 'margin', 'w': 'width', 'h': 'height', 'radius': 'border-radius',
         'bg': 'background-color', 'text': 'color', 'shadow': 'box-shadow', 'glass': 'backdrop-filter',
-        'clip': 'clip-path', 'flag': 'background-image', 'cursor': 'cursor', 
-        'transition': 'transition', 'trans': 'transition' // إضافة الاختصار
+        'clip': 'clip-path', 'flag': 'background-image', 'cursor': 'cursor', 'transition': 'transition', 'trans': 'transition'
     };
 
     const breakpoints = { 'sm': '480px', 'md': '768px', 'lg': '1024px', 'xl': '1280px' };
@@ -44,13 +47,10 @@ const FlashCSS = (function() {
         if (!rawVal) return '';
         if (prop === 'clip' && shapes[rawVal]) return shapes[rawVal];
         if (prop === 'flag' && shapes[rawVal]) return shapes[rawVal];
-        
-        // دعم اختصارات الـ Transition
         if ((prop === 'transition' || prop === 'trans')) {
             if (rawVal === 'fast') return '0.2s ease';
             if (rawVal === 'slow') return '0.6s ease';
         }
-
         if (!isNaN(rawVal) && ['p','m','w','h','gap'].includes(prop)) return (parseFloat(rawVal) * 0.25) + 'rem';
         
         const audioMatch = rawVal.match(/([a-z-]+)(?:\[(.*)\])?/);
@@ -61,21 +61,24 @@ const FlashCSS = (function() {
     }
 
     function processElement(el) {
-        if (!el || !el.attributes) return;
+        if (!el || !el.attributes || !el.getAttribute) return;
 
+        // 1. Morphing (f-ui)
         const uiName = el.getAttribute('f-ui');
         if (uiName && uiPresets[uiName]) {
-            uiPresets[uiName].split(' ').forEach(attr => {
-                const [k, v] = attr.split('=');
-                const val = v.replace(/"/g, '');
-                if (!el.hasAttribute(k)) el.setAttribute(k, val);
+            uiPresets[uiName].split(' ').forEach(attrStr => {
+                const eqIdx = attrStr.indexOf('=');
+                if (eqIdx === -1) return;
+                const k = attrStr.substring(0, eqIdx);
+                const v = attrStr.substring(eqIdx + 1).replace(/"/g, '');
+                if (!el.hasAttribute(k)) el.setAttribute(k, v);
             });
         }
 
         Array.from(el.attributes).forEach(attr => {
-            if (attr.name.startsWith('f-')) {
+            if (attr.name && attr.name.startsWith('f-')) {
                 let attrName = attr.name.replace('f-', '');
-                const rawVal = attr.value;
+                const rawVal = attr.value || ''; // حماية من الـ undefined
 
                 if (attrName === 'glass') {
                     const blur = rawVal === 'heavy' ? '25px' : rawVal === 'light' ? '4px' : '10px';
@@ -86,6 +89,8 @@ const FlashCSS = (function() {
                     return;
                 }
 
+                if (!rawVal && attrName !== 'glass') return; // منع الـ replace لو القيمة فاضية
+
                 let bpValue = '', statePrefix = '';
                 for (let b in breakpoints) {
                     if (attrName.startsWith(`${b}-`)) { bpValue = breakpoints[b]; attrName = attrName.replace(`${b}-`, ''); break; }
@@ -93,13 +98,12 @@ const FlashCSS = (function() {
                 if (attrName.startsWith('hover-')) { statePrefix = ':hover'; attrName = attrName.replace('hover-', ''); }
                 if (attrName.startsWith('focus-')) { statePrefix = ':focus'; attrName = attrName.replace('focus-', ''); }
 
-                // دعم f-hover-scale="1.1" المباشر
                 if (attrName === 'scale' && statePrefix === ':hover') {
                     el.style.transition = el.style.transition || 'transform 0.3s ease';
-                    const className = `f-hover-scale-${rawVal.replace('.', '-')}`;
+                    const safeScale = rawVal.toString().replace(/[^0-9.]/g, '');
+                    const className = `f-hover-scale-${safeScale.replace('.', '-')}`;
                     if (!processedRules.has(className)) {
-                        sheet.insertRule(`.${className}:hover { transform: scale(${rawVal}) !important; }`, sheet.cssRules.length);
-                        processedRules.add(className);
+                        try { sheet.insertRule(`.${className}:hover { transform: scale(${safeScale}) !important; }`, sheet.cssRules.length); processedRules.add(className); } catch(e){}
                     }
                     el.classList.add(className);
                     return;
@@ -108,12 +112,15 @@ const FlashCSS = (function() {
                 const parsed = parseNeuralValue(attrName, rawVal);
                 const propFull = map[attrName] || attrName;
 
-                if (parsed.isAudio) {
+                if (parsed && parsed.isAudio) {
                     el.style.setProperty(parsed.target, `calc(var(--f-audio-vol) * ${parsed.max})`, 'important');
                     return;
                 }
 
-                const className = `f-${bpValue ? 'bp-' : ''}${statePrefix ? 'st-' : ''}${attrName}-${rawVal.replace(/[^a-z0-9]/gi, '-')}`;
+                // تنظيف القيمة قبل استخدامها في الكلاس
+                const safeClassNameVal = rawVal.toString().replace(/[^a-z0-9]/gi, '-');
+                const className = `f-${bpValue ? 'bp-' : ''}${statePrefix ? 'st-' : ''}${attrName}-${safeClassNameVal}`;
+                
                 if (!processedRules.has(className)) {
                     let rule = `.${className}${statePrefix} { ${propFull}: ${parsed} !important; }`;
                     if (bpValue) rule = `@media (min-width: ${bpValue}) { ${rule} }`;
@@ -136,15 +143,14 @@ const FlashCSS = (function() {
 
     const observer = new MutationObserver(muts => muts.forEach(m => {
         if (m.type === 'childList') m.addedNodes.forEach(n => n.nodeType === 1 && processElement(n));
-        else if (m.type === 'attributes' && m.attributeName.startsWith('f-')) processElement(m.target);
+        else if (m.type === 'attributes' && m.attributeName && m.attributeName.startsWith('f-')) processElement(m.target);
     }));
 
     let isInitialized = false;
     const init = () => {
-        if (isInitialized) return;
+        if (isInitialized || !document.body) return;
         isInitialized = true;
         
-        // الكشف عن تفضيلات النظام للـ Dark Mode
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         const savedTheme = localStorage.getItem('f-theme') || (prefersDark ? 'dark' : 'light');
         
@@ -156,19 +162,25 @@ const FlashCSS = (function() {
         observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true });
     };
 
-    if (document.readyState === 'complete' || document.readyState === 'interactive') init();
-    else window.addEventListener('DOMContentLoaded', init);
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        init();
+    } else {
+        window.addEventListener('DOMContentLoaded', init);
+    }
 
     return { 
         setTheme: (n) => {
+            if (!themes[n]) return;
             Object.entries(themes[n]).forEach(([p, v]) => document.documentElement.style.setProperty(`--f-${p}`, v));
             localStorage.setItem('f-theme', n);
         },
         connectAudio: (stream) => {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = ctx.createAnalyser();
-            ctx.createMediaStreamSource(stream).connect(analyser);
-            dataArray = new Uint8Array(analyser.frequencyBinCount);
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = ctx.createAnalyser();
+                ctx.createMediaStreamSource(stream).connect(analyser);
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+            } catch(e) { console.error("FlashCSS: Audio context failed", e); }
         }
     };
 })();
